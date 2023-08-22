@@ -550,18 +550,18 @@ namespace CursoVIKlast {
 		this->is_equal = true;
 		this->result_label->Text = System::Convert::ToString(res);
 	}
-    private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 		this->result_label->Text = "0";
 		this->first_num = 0;
 		this->user_action = ' ';
 		this->is_equal = false;
 	}
-    private: System::Void btn_minus_plus_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void btn_minus_plus_Click(System::Object^ sender, System::EventArgs^ e) {
 		float num = System::Convert::ToDouble(this->result_label->Text);
 		num *= -1;
 		this->result_label->Text = System::Convert::ToString(num);
 	}
-    private: System::Void btn_persent_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void btn_persent_Click(System::Object^ sender, System::EventArgs^ e) {
 		math_action('%');
 	}
 	private: System::Void btn_dot_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -570,5 +570,5 @@ namespace CursoVIKlast {
 			this->result_label->Text = text + ",";
 		}
 	}
-};
+	};
 }

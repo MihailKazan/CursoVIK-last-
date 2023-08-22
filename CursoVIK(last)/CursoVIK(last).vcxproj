@@ -108,15 +108,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\mihai\source\repos\CursoVIK%28last%29\BearLibTerminal_0.15.8\Include\C;C:\Users\mihai\source\repos\CursoVIK%28last%29\BearLibTerminal_0.15.8\Windows64;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies />
+      <AdditionalDependencies>BearLibTerminal.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\mihai\source\repos\CursoVIK%28last%29\BearLibTerminal_0.15.8\Windows64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CursoVik1.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MyForm.cpp" />
     <ClCompile Include="Ships.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,5 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

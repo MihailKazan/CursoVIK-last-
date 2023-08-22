@@ -15,9 +15,9 @@ using namespace std;
 using namespace System;
 using namespace System::Windows::Forms;
 
-bool Continue = true;
+bool Contin = true;
 
-int Check(vector <int> vecx, vector <int> vecy, int x, int y) {
+int Check(vector <int> vecx, vector <int> vecy, int x, int y) { // не даёт нажимать на одну и ту же координату
 	for (int i = 0; i < vecx.size(); i++) {
 		if (vecx[i] == x && vecy[i] == y) {
 			return 0;
@@ -27,23 +27,32 @@ int Check(vector <int> vecx, vector <int> vecy, int x, int y) {
 }
 
 struct Play : Value {
-	int I = 0;
+	int I = 0; // общий счётчик до победы
 	vector <int> X1;
 	vector <int> Y1;
 	vector <int> X2;
 	vector <int> Y2;
+	vector <int> point; // убийство корабля
 	void Player(int a, int b, int minx, int maxx, int miny, int maxy,int num) {
 		bool miss = false;
 		int x, y;
 		x = a;
 		y = b;
-		terminal_open();
 		terminal_set("0x02B: cursor.png, size=16x16");//+
-		terminal_printf(a, b, "+");
+		terminal_set("0x058: ship.png, size=16x16");//X
+		terminal_set("0x04F: miss.png, size=16x16");//O
 		while (1) {
 			terminal_clear();
+			for (int q = 0; q < X2.size(); q++) {
+				terminal_printf(X2[q], Y2[q], "O");
+			}
+			terminal_printf(x, y, "+");// можно ещё отрисовать чтобы лучше смотрелось
+			for (int q = 0; q < X1.size(); q++) {
+				terminal_printf(X1[q], Y1[q], "X");
+			}
 			getMap();
-			//Draw();
+			//Draw(); //отрисовка кораблей 
+			terminal_refresh();
 			if (terminal_has_input) {
 				int cours = terminal_read();
 				switch (cours) {
@@ -67,6 +76,24 @@ struct Play : Value {
 					if (Proof(x,y)) {
 						if (Check(X1, Y1, x, y)) {
 							I++;
+							if (Proof2(x, y,point)) { // добавление точек вокруг корабля
+								if (Proof2(x,y,point) == 2) {
+									for (int j = 0; j < 3; j++) {
+										for (int n = 0; n < 3; n++) {
+											X2.push_back(x - 2 + n * 2);
+											Y2.push_back(y - 1 + j);
+										}
+									}
+								}
+								for (int q = 0; q < point.size() / 2; q++) {
+									for (int j = 0; j < 3; j++) {
+										for (int n = 0; n < 3; n++) {
+											X2.push_back(point[q * 2] - 2 + n * 2);
+											Y2.push_back(point[q * 2 + 1] - 1 + j);
+										}
+									}
+								}
+							}
 						}
 						X1.push_back(x);
 						Y1.push_back(y);
@@ -78,26 +105,19 @@ struct Play : Value {
 					}
 					break;
 				case(41):
-					Continue = false;
+					Contin = false;
 					return;
 					break;
 				}
 			}
-			terminal_set("0x058: ship.png, size=16x16");//X
-			terminal_set("0x04F: miss.png, size=16x16");//O
-			terminal_printf(x, y, "+");
-			for (int q = 0; q < X1.size(); q++) {
-				terminal_printf(X1[q], Y1[q], "X");
-			}
-			for (int q = 0; q < X2.size(); q++) {
-				terminal_printf(X2[q], Y2[q], "O");
-			}
-			terminal_refresh();
 			if (I == 20) {
 				string win = "WINS PLAYER " + to_string(num) + " !";
 				terminal_printf(30, 20, win.c_str());
 				terminal_refresh();
-				exit;
+				if (terminal_has_input) {
+					Contin = false;
+				}
+				return;
 			}
 			if (miss) {
 				return;
@@ -108,25 +128,29 @@ struct Play : Value {
 
 [STAThreadAttribute]
 
-int main() { // 79 24////////////////////////////////////////
+int main() { // 79 24
 	setlocale(LC_ALL, "rus");
 
 	bool Good = true;
 
-	while (Good) {
+	while (Good) { // главный цикл
+
 		Play Exm1;
 		Play Exm2;
 
-		Exm1.Func(1, 4, 11, 3, 32, 14);
-		Exm1.Func(2, 3, 11, 3, 32, 14);
-		Exm1.Func(3, 2, 11, 3, 32, 14);
 		Exm1.Func(4, 1, 11, 3, 32, 14);
+		Exm1.Func(3, 2, 11, 3, 32, 14);
+		Exm1.Func(2, 3, 11, 3, 32, 14);
+		Exm1.Func(1, 4, 11, 3, 32, 14);
 
-		Exm2.Func(1, 4, 47, 3, 63, 14);
-		Exm2.Func(2, 3, 47, 3, 63, 14);
-		Exm2.Func(3, 2, 47, 3, 63, 14);
 		Exm2.Func(4, 1, 47, 3, 63, 14);
-
+		Exm2.Func(3, 2, 47, 3, 63, 14);
+		Exm2.Func(2, 3, 47, 3, 63, 14);
+		Exm2.Func(1, 4, 47, 3, 63, 14);
+		
+		Exm1.SeparatNull();
+		Exm2.SeparatNull(); 
+		
 		HDC hdc = GetDC(GetConsoleWindow());
 		Saver();
 		system("cls");
@@ -147,7 +171,7 @@ int main() { // 79 24////////////////////////////////////////
 		cout << " ";
 		while (1) { // хорошо бы добавить точку в начале
 
-			Continue = true;
+			Contin = true;
 
 			BRUSH = CreateSolidBrush(RGB(255, 255, 255)); // смена цвета белый
 			SelectObject(hdc, BRUSH);
@@ -166,7 +190,6 @@ int main() { // 79 24////////////////////////////////////////
 				Y--;
 				i--;
 			}
-
 			Ellipse(hdc, 430, 84 + 48 * Y, 440, 94 + 48 * Y);
 			BRUSH = CreateSolidBrush(RGB(0, 0, 0)); // смена цвета чёрный
 			SelectObject(hdc, BRUSH);
@@ -176,9 +199,11 @@ int main() { // 79 24////////////////////////////////////////
 			if (Inp == 13) {
 				if (Y == 0) {
 					system("cls");
-					while (Continue) {
+					terminal_open();
+					while (Contin) {
 						Exm1.Player(22, 8, 12, 29, 4, 13, 1);
-						if (Continue == false) {
+						if (Contin == false) {
+							Inp = terminal_read();
 							terminal_clear();
 							terminal_close();
 							break;
@@ -192,7 +217,6 @@ int main() { // 79 24////////////////////////////////////////
 					Application::EnableVisualStyles();
 					CursoVIKlast::MyForm form;
 					Application::Run(% form);
-					break;
 					break;
 				}
 				if (Y == 2) {
@@ -216,6 +240,7 @@ int main() { // 79 24////////////////////////////////////////
 					system("cls");
 					break;
 				}
+				break;
 			}
 		}
 	}
